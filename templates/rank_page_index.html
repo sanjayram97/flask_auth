@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head> 
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Add Remove Input Fields Dynamically with JQuery Ajax Python Flask and PostgreSQL</title>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" />  
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>  
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>   
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script> 
+</head>
+<body>
+ <script>
+$(document).ready(function() {
+  
+var MaxInputs       = 8; //maximum input boxes allowed
+var InputsWrapper   = $("#InputsWrapper"); //Input boxes wrapper ID
+var AddButton       = $("#AddMoreFileBox"); //Add button ID
+  
+var x = InputsWrapper.length; //initlal text box count
+var FieldCount=1; //to keep track of text box added
+  
+$(AddButton).click(function (e)  //on add input button click
+{
+    if(x <= MaxInputs) //max input box allowed
+    {
+        FieldCount++; //text box added increment
+        //add input box
+        $(InputsWrapper).append('<div class="row"><p class="col-xs-6"><input type="text" placeholder="Enter your keyword" class="form-control skill_list" name="customFieldValue[]" id="field_'+ FieldCount +'" value="Enter your keyword '+ FieldCount +'"/></p><a href="#" class="btn btn-danger removeclass">×</a></div>');
+        x++; //text box increment
+    }
+    return false;
+});
+  
+$("body").on("click",".removeclass", function(e){ //user click on remove text
+    if( x > 1 ) {
+        $(this).parent('div').remove(); //remove text box
+         x--; //decrement textbox
+    }
+    return false;
+})
+
+
+});
+</script>
+<style>
+.row {padding:10px;}
+</style>
+<div class="container"><br /> <br />  
+    <h2 align="center">Rank Finder</h2><div id="resultbox"></div>  
+    <div class="form-group">  
+        <form action="{{ url_for("login")}}" method="post">  
+        <div id="InputsWrapper">
+            <div class="row">
+				<div class="col-xs-12"><input type="text" name="website" placeholder="Enter your website" class="form-control name_list" /></div>
+                <br><br><br><div class="col-xs-6"><input type="text" name="customFieldName[]" placeholder="Enter your keyword" class="form-control name_list" /></div>
+                <div class="col-xs-6"><button type="button" name="add" id="AddMoreFileBox" class="btn btn-success">Add More</button></div>
+            </div>
+        </div>
+        <br/>
+        <button type="submit" data-kt-contacts-type="submit" class="btn btn-primary">
+			<span class="indicator-label">Submit</span>
+		</button> 
+        </form>  
+    </div>  
+</div> 
+<br><br><br>
+{% block content %}
+
+    {% endblock %} 
+</body>
+</html>

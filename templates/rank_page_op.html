@@ -1,0 +1,18 @@
+{% extends "rank_page_index.html" %}
+{% block content %}
+<div class="container">
+<!-- {% for i,j in output_dict.items() %}
+  
+    <h3 style="color: red;">{{i}}</h3> : <h3 style="color: green;">{{j}}</h3>
+{% endfor %} -->
+
+
+
+<hr>
+<hr>
+<table>
+    {{ output_df.to_html(classes="table table-striped") | safe}}
+</table>
+
+</div>
+{% endblock %}

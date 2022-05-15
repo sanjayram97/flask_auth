@@ -5,6 +5,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
+from datetime import datetime
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -24,11 +25,17 @@ def load_user(user_id):
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), nullable=False, unique=True)
+    email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
+    auth_date = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 class RegisterForm(FlaskForm):
     username = StringField(validators=[
                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
+
+    email = StringField(validators=[
+                        InputRequired(), Length(min=5, max=100)], render_kw={"placeholder": "email"})
 
     password = PasswordField(validators=[
                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
@@ -70,7 +77,7 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    return render_template('rank_page_index.html', user = current_user)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
@@ -83,7 +90,7 @@ def register():
     form = RegisterForm()
     if form.validate_on_submit():
          hashed_password = bcrypt.generate_password_hash(form.password.data)
-         new_user = User(username=form.username.data, password=hashed_password)
+         new_user = User(username=form.username.data, email=form.email.data, password=hashed_password)
          db.session.add(new_user)
          db.session.commit()
          return redirect(url_for('login'))
