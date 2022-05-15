@@ -27,7 +27,7 @@ class User(db.Model, UserMixin):
     username = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(db.String(80), nullable=False, unique=True)
     password = db.Column(db.String(80), nullable=False)
-    auth_date = db.Column(db.DateTime, default=datetime.utcnow)
+    auth_date = db.Column(db.DateTime, default=datetime.now())
 
 
 class RegisterForm(FlaskForm):
