@@ -1,4 +1,4 @@
-from flask import Flask, render_template, url_for, redirect
+from flask import Flask, render_template, url_for, redirect, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
@@ -6,6 +6,10 @@ from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
 from datetime import datetime
+import pandas as pd
+from utils import *
+# from seo import *
+import time
 
 app = Flask(__name__)
 db = SQLAlchemy(app)
@@ -77,7 +81,45 @@ def login():
 @app.route('/dashboard', methods=['GET', 'POST'])
 @login_required
 def dashboard():
-    return render_template('rank_page_index.html', user = current_user)
+    if request.method == 'GET':
+        return render_template('rank_page_index.html', user = current_user)
+    
+    website = request.form.get('website')
+    keywords = request.form.getlist('customFieldName[]')
+    keyword_list = request.form.getlist('customFieldValue[]')
+    keywords.extend(keyword_list)
+
+    print('---')
+    print(website)
+    print(keywords)
+    print('---')
+
+    output_dict = {}
+    output_df = pd.DataFrame()
+    if len(keywords) >= 1:
+        for i in keywords:
+            ret = url_keyword_rank(website, i)
+            output_dict[i] = ret
+            print('sleep')
+            time.sleep(2)
+            print('sleep over')
+        print(output_dict)
+
+    else:
+        ret = url_keyword_rank(website, keywords[0])
+        output_dict[i] = ret
+    
+    for i,j in output_dict.items():
+        d = {}
+        d['keyword'] = i
+        g_val = j.split(',')
+        d['position'] = g_val[0]
+        d['page'] = g_val[1]
+        output_df = output_df.append(d, ignore_index=True)
+
+    print('render')
+
+    return render_template('rank_page_op.html', output_dict = output_dict, output_df = output_df, user = current_user)
 
 @app.route('/logout', methods=['GET', 'POST'])
 @login_required
